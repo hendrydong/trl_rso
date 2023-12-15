@@ -25,6 +25,7 @@ from transformers import (
     DataCollatorForSeq2Seq,
     HfArgumentParser
 )
+import torch
 
 from trl.trainer.utils import generate
 
@@ -33,7 +34,6 @@ from trl.trainer.utils import generate
 class ScriptArguments:
     # model parameters
     model_name_or_path: Optional[str] = field(default=None, metadata={"help": "the model name"})
-    mixed_precision: Optional[str] = field(default="fp16", metadata={"help": "the model dtype"})
     # data parameters
     dataset_name: Optional[str] = field(default="Dahoas/full-hh-rlhf", metadata={"help": "the HF data path"})
     split: Optional[str] = field(default="train", metadata={"help": "the dataset split to use for generation"})
@@ -57,11 +57,11 @@ if __name__ == "__main__":
     script_args = parser.parse_args_into_dataclasses()[0]
 
     accelerator = Accelerator(
-        mixed_precision=script_args.mixed_precision
+        mixed_precision="bf16"
     )
     
     # load sft policy
-    model = AutoModelForCausalLM.from_pretrained(script_args.model_name_or_path,trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained(script_args.model_name_or_path,torch_dtype=torch.bfloat16,trust_remote_code=True)
     
     tokenizer = AutoTokenizer.from_pretrained(script_args.model_name_or_path)
 
