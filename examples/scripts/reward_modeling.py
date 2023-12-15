@@ -23,7 +23,7 @@ from tqdm import tqdm
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, BitsAndBytesConfig
 
 from trl import RewardConfig, RewardTrainer
-
+import torch
 
 tqdm.pandas()
 
@@ -85,7 +85,7 @@ accelerator = Accelerator(
 if args.load_in_8bit and args.load_in_4bit:
     raise ValueError("You can't load the model in 8 bits and 4 bits at the same time")
 elif args.load_in_8bit or args.load_in_4bit:
-    quantization_config = BitsAndBytesConfig(load_in_8bit=args.load_in_8bit, load_in_4bit=args.load_in_4bit)
+    quantization_config = BitsAndBytesConfig(load_in_8bit=args.load_in_8bit, torch_dtype=torch.bfloat16, load_in_4bit=args.load_in_4bit)
     # Copy the model to each device
     device_map = {"": Accelerator().local_process_index}
 else:
