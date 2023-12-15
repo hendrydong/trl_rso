@@ -61,7 +61,7 @@ if __name__ == "__main__":
     )
     
     # load sft policy
-    model = AutoModelForCausalLM.from_pretrained(script_args.model_name_or_path)
+    model = AutoModelForCausalLM.from_pretrained(script_args.model_name_or_path,trust_remote_code=True)
     
     tokenizer = AutoTokenizer.from_pretrained(script_args.model_name_or_path)
 
