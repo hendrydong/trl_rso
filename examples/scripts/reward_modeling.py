@@ -47,7 +47,7 @@ class ScriptArguments:
     reward_config: RewardConfig = field(
         default_factory=lambda: RewardConfig(
             output_dir="output",
-            per_device_train_batch_size=64,
+            per_device_train_batch_size=1,
             num_train_epochs=1,
             gradient_accumulation_steps=1,
             gradient_checkpointing=True,
