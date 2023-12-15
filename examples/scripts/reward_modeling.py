@@ -100,6 +100,7 @@ model = AutoModelForSequenceClassification.from_pretrained(
 tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 train_dataset = load_dataset(args.dataset_name, split="train")
 
+tokenizer.pad_token = tokenizer.eos_token
 
 # Tokenize chosen/rejected pairs of inputs
 # Adapt this section to your needs for custom datasets

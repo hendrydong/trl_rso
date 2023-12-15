@@ -38,7 +38,7 @@ class ScriptArguments:
     dataset_name: Optional[str] = field(default="Dahoas/full-hh-rlhf", metadata={"help": "the HF data path"})
     split: Optional[str] = field(default="train", metadata={"help": "the dataset split to use for generation"})
     batch_size: Optional[int] = field(default=8, metadata={"help": "the generation batch size"})
-    max_prompt_length: Optional[int] = field(default=512, metadata={"help": "the maximum prompt length"})
+    max_prompt_length: Optional[int] = field(default=100, metadata={"help": "the maximum prompt length"})
     save_dataset_path: Optional[str] = field(default="sft_gen_dataset", metadata={"help": "the path for saving the generated dataset"})
     # generation parameters
     max_new_tokens: Optional[int] = field(
