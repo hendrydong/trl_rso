@@ -57,7 +57,7 @@ class ScriptArguments:
             report_to="wandb",
             remove_unused_columns=False,
             optim="adamw_torch",
-            logging_steps=500,
+            logging_steps=10,
             evaluation_strategy="no",
             max_length=512,
             bf16=True,
