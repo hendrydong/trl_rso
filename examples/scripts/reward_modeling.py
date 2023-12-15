@@ -58,6 +58,7 @@ class ScriptArguments:
             logging_steps=500,
             evaluation_strategy="no",
             max_length=512,
+            bf16=True,
         )
     )
     use_peft: bool = False
