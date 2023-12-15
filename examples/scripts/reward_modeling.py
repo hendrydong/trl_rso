@@ -49,7 +49,7 @@ class ScriptArguments:
             output_dir="output",
             per_device_train_batch_size=64,
             num_train_epochs=1,
-            gradient_accumulation_steps=16,
+            gradient_accumulation_steps=1,
             gradient_checkpointing=True,
             learning_rate=1.41e-5,
             report_to="tensorboard",
