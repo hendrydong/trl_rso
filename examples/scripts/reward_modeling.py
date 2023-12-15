@@ -77,6 +77,10 @@ args = tyro.cli(ScriptArguments)
 args.reward_config.evaluation_strategy = "steps" if args.eval_split != "none" else "no"
 
 
+accelerator = Accelerator(
+    mixed_precision="bf16"
+)
+
 # Step 1: Load the model
 if args.load_in_8bit and args.load_in_4bit:
     raise ValueError("You can't load the model in 8 bits and 4 bits at the same time")
