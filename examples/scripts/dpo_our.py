@@ -152,6 +152,7 @@ if __name__ == "__main__":
         script_args.model_name_or_path,
         low_cpu_mem_usage=True,
         torch_dtype=torch.float16,
+        trust_remote_code=True,
         #load_in_4bit=True,
     )
     model.config.use_cache = False
@@ -166,6 +167,7 @@ if __name__ == "__main__":
         script_args.model_name_or_path,
         low_cpu_mem_usage=True,
         torch_dtype=torch.float16,
+        trust_remote_code=True,
         #load_in_4bit=True,
     )
     tokenizer = AutoTokenizer.from_pretrained(script_args.model_name_or_path)
