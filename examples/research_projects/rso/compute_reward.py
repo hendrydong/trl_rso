@@ -33,11 +33,11 @@ from trl.trainer.utils import conduct_rejection_sampling, compute_reward_score
 @dataclass
 class ScriptArguments:
     reward_model_name_or_path: Optional[str] = field(default=None, metadata={"help": "the model name"})
-    mixed_precision: Optional[str] = field(default="fp16", metadata={"help": "the model dtype"})
+    mixed_precision: Optional[str] = field(default="bf16", metadata={"help": "the model dtype"})
     # data parameters
     dataset_name: Optional[str] = field(default=None, metadata={"help": "the generated dataset path"})
     batch_size: Optional[int] = field(default=32, metadata={"help": "the scoring batch size"})
-    save_dataset_path: Optional[str] = field(default="sft_gen_dataset_ranked", metadata={"help": "the path for saving the dataset"})
+    save_dataset_path: Optional[str] = field(default="sft_gen_dataset_with_reward", metadata={"help": "the path for saving the dataset"})
     
     # rejection sampling 
     num_samples: Optional[int] = field(default=8, metadata={"help": "the number of samples to keep after rejection sampling"})
@@ -150,9 +150,11 @@ if __name__ == "__main__":
     rewards = rewards[: len(dataset)]
 
     dataset = dataset.add_column("rewards", rewards)
-    
+
     # save the dataset for later finetuning with DPO
     dataset.save_to_disk(script_args.save_dataset_path)
+
+    print("mean reward:", rewards.mean())
     
     
     
