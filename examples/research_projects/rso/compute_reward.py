@@ -30,6 +30,8 @@ from transformers import (
 
 from trl.trainer.utils import conduct_rejection_sampling, compute_reward_score
 
+import numpy as np
+
 @dataclass
 class ScriptArguments:
     reward_model_name_or_path: Optional[str] = field(default=None, metadata={"help": "the model name"})
@@ -154,7 +156,7 @@ if __name__ == "__main__":
     # save the dataset for later finetuning with DPO
     dataset.save_to_disk(script_args.save_dataset_path)
 
-    print("mean reward:", rewards.mean())
+    print("mean reward:", np.mean(rewards))
     
     
     
