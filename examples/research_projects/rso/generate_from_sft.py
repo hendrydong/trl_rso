@@ -36,6 +36,7 @@ class ScriptArguments:
     model_name_or_path: Optional[str] = field(default=None, metadata={"help": "the model name"})
     # data parameters
     dataset_name: Optional[str] = field(default="Dahoas/full-hh-rlhf", metadata={"help": "the HF data path"})
+    dataset_col: Optional[str] = field(default="prompt", metadata={"help": "the HF data path"})
     split: Optional[str] = field(default="train", metadata={"help": "the dataset split to use for generation"})
     batch_size: Optional[int] = field(default=8, metadata={"help": "the generation batch size"})
     max_prompt_length: Optional[int] = field(default=100, metadata={"help": "the maximum prompt length"})
@@ -88,7 +89,7 @@ if __name__ == "__main__":
         dataset = dataset.select(range(min(len(dataset), 100)))
 
     def tokenize_fn(samples):
-        model_inputs = tokenizer(samples["prompt"])
+        model_inputs = tokenizer(samples[script_args.dataset_col])
 
         return {
             **model_inputs,
