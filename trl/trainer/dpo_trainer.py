@@ -354,16 +354,19 @@ class DPOTrainer(Trainer):
         """
         pi_logratios = policy_chosen_logps - policy_rejected_logps
         ref_logratios = reference_chosen_logps - reference_rejected_logps
-
         if reference_free:
             ref_logratios = 0
 
-        logits = pi_logratios - ref_logratios
 
         if self.loss_type == "sigmoid":
+            logits = pi_logratios - ref_logratios
             losses = -F.logsigmoid(self.beta * logits)
         elif self.loss_type == "hinge":
+            logits = pi_logratios - ref_logratios
             losses = torch.relu(1 - self.beta * logits)
+        elif self.loss_type == "cross_entropy":
+            logits = policy_chosen_logps - reference_chosen_logps
+            losses = -F.logsigmoid(self.beta * logits)
         else:
             raise ValueError(f"Unknown loss type: {self.loss_type}. Should be one of ['sigmoid', 'hinge']")
 
