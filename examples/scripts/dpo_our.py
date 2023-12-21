@@ -37,7 +37,7 @@ class ScriptArguments:
     warmup_steps: Optional[int] = field(default=100, metadata={"help": "the number of warmup steps"})
     weight_decay: Optional[float] = field(default=0.05, metadata={"help": "the weight decay"})
     optimizer_type: Optional[str] = field(default="adamw_hf", metadata={"help": "the optimizer type"})
-
+    loss_type: Optional[str] = field(default="sigmoid", metadata={"help": "the loss type"})
     per_device_train_batch_size: Optional[int] = field(default=1, metadata={"help": "train batch size per device"})
     per_device_eval_batch_size: Optional[int] = field(default=1, metadata={"help": "eval batch size per device"})
     gradient_accumulation_steps: Optional[int] = field(
@@ -206,6 +206,7 @@ if __name__ == "__main__":
         evaluation_strategy="steps",
         eval_steps=script_args.eval_steps,
         output_dir=script_args.output_dir,
+        loss_type=script_args.loss_type,
         #report_to=script_args.report_to,
         lr_scheduler_type=script_args.lr_scheduler_type,
         warmup_steps=script_args.warmup_steps,

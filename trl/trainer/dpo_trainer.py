@@ -106,7 +106,7 @@ class DPOTrainer(Trainer):
         model: Union[PreTrainedModel, nn.Module] = None,
         ref_model: Optional[Union[PreTrainedModel, nn.Module]] = None,
         beta: float = 0.1,
-        loss_type: Literal["sigmoid", "hinge"] = "sigmoid",
+        loss_type: Literal["sigmoid", "hinge", "cross_entropy"] = "sigmoid",
         args: TrainingArguments = None,
         data_collator: Optional[DataCollator] = None,
         label_pad_token_id: int = -100,
