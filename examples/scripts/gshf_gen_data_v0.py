@@ -26,7 +26,7 @@ accelerator = Accelerator()
 AcceleratorState().deepspeed_plugin.deepspeed_config['train_micro_batch_size_per_gpu'] = 4
 
 
-ds_dir = "../data/rlhf_eval/helpful_5739.json"
+ds_dir = "./helpful_5739.json"
 model_name = "gpt2"
 output_dir = "./my_gen.json"
 K = 2
