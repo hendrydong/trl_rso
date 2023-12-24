@@ -37,11 +37,11 @@ class ScriptArguments:
     warmup_steps: Optional[int] = field(default=100, metadata={"help": "the number of warmup steps"})
     weight_decay: Optional[float] = field(default=0.05, metadata={"help": "the weight decay"})
     optimizer_type: Optional[str] = field(default="adamw_hf", metadata={"help": "the optimizer type"})
-    loss_type: Optional[str] = field(default="sigmoid", metadata={"help": "the loss type"})
+
     per_device_train_batch_size: Optional[int] = field(default=1, metadata={"help": "train batch size per device"})
     per_device_eval_batch_size: Optional[int] = field(default=1, metadata={"help": "eval batch size per device"})
     gradient_accumulation_steps: Optional[int] = field(
-        default=2, metadata={"help": "the number of gradient accumulation steps"}
+        default=5, metadata={"help": "the number of gradient accumulation steps"}
     )
     gradient_checkpointing: Optional[bool] = field(
         default=True, metadata={"help": "whether to use gradient checkpointing"}
@@ -53,14 +53,14 @@ class ScriptArguments:
     lora_dropout: Optional[float] = field(default=0.05, metadata={"help": "the lora dropout parameter"})
     lora_r: Optional[int] = field(default=8, metadata={"help": "the lora r parameter"})
 
-    max_prompt_length: Optional[int] = field(default=256, metadata={"help": "the maximum prompt length"})
-    max_length: Optional[int] = field(default=512, metadata={"help": "the maximum sequence length"})
+    max_prompt_length: Optional[int] = field(default=1400, metadata={"help": "the maximum prompt length"})
+    max_length: Optional[int] = field(default=2800, metadata={"help": "the maximum sequence length"})
     max_steps: Optional[int] = field(default=100000, metadata={"help": "max number of training steps"})
-    logging_steps: Optional[int] = field(default=10, metadata={"help": "the logging frequency"})
-    save_steps: Optional[int] = field(default=500, metadata={"help": "the saving frequency"})
-    eval_steps: Optional[int] = field(default=500, metadata={"help": "the evaluation frequency"})
+    logging_steps: Optional[int] = field(default=2, metadata={"help": "the logging frequency"})
+    save_steps: Optional[int] = field(default=940, metadata={"help": "the saving frequency"})
+    eval_steps: Optional[int] = field(default=940, metadata={"help": "the evaluation frequency"})
 
-    output_dir: Optional[str] = field(default="/home/xiongwei/over_opt/LMFlow_RAFT_Dev/output_models/forgetting_proj/dpo", metadata={"help": "the output directory"})
+    output_dir: Optional[str] = field(default="/home/xiongwei/over_opt/LMFlow_RAFT_Dev/output_models/forgetting_proj/dpo2", metadata={"help": "the output directory"})
     log_freq: Optional[int] = field(default=1, metadata={"help": "the logging frequency"})
 
     # instrumentation
@@ -152,7 +152,6 @@ if __name__ == "__main__":
         script_args.model_name_or_path,
         low_cpu_mem_usage=True,
         torch_dtype=torch.float16,
-        trust_remote_code=True,
         #load_in_4bit=True,
     )
     model.config.use_cache = False
@@ -167,29 +166,49 @@ if __name__ == "__main__":
         script_args.model_name_or_path,
         low_cpu_mem_usage=True,
         torch_dtype=torch.float16,
-        trust_remote_code=True,
         #load_in_4bit=True,
     )
     tokenizer = AutoTokenizer.from_pretrained(script_args.model_name_or_path)
     tokenizer.pad_token = tokenizer.eos_token
 
+
+    def tokenize(sample):
+        #tokenized_pos = rm_tokenizer(sample['positive'], truncation=True)
+        #tokenized_neg = rm_tokenizer(sample['negative'], truncation=True)
+        tokenized_pos = tokenizer(sample['prompt'] + sample['chosen'])
+        tokenized_neg = tokenizer(sample['prompt'] + sample['rejected'])
+        prompt_id = tokenizer(sample['prompt'])
+        sample['tprompdt_ids'] = prompt_id['input_ids']
+        sample["tchosen_input_ids"] = tokenized_pos["input_ids"]
+        sample["trejected_input_ids"] = tokenized_neg["input_ids"]
+        return sample        
     # 2. Load the Stack-exchange paired dataset
     train_dataset = get_stack_exchange_paired(data_dir=script_args.train_dir,sanity_check=script_args.sanity_check)
+    '''
     train_dataset = train_dataset.filter(
-        lambda x: len(x["prompt"]) + len(x["chosen"]) <= script_args.max_length
-        and len(x["prompt"]) + len(x["rejected"]) <= script_args.max_length
+        lambda x: len(x["tchosen_input_ids"]) <= script_args.max_length
+        and len(x["trejected_input_ids"]) <= script_args.max_length
     )
+    '''
+    train_dataset = train_dataset.map(tokenize)
+    train_dataset = train_dataset.filter(lambda x: len(x["tchosen_input_ids"]) <= 800 and len(x["trejected_input_ids"]) <= 800 and len(x['tprompdt_ids']) <= 300)
 
     # 3. Load evaluation dataset
     eval_dataset = get_stack_exchange_paired(data_dir=script_args.eval_dir, sanity_check=True)
+    eval_dataset = eval_dataset.map(tokenize)
+    '''
     eval_dataset = eval_dataset.filter(
         lambda x: len(x["prompt"]) + len(x["chosen"]) <= script_args.max_length
         and len(x["prompt"]) + len(x["rejected"]) <= script_args.max_length
     )
+    '''
+    eval_dataset = eval_dataset.filter(lambda x: len(x["tchosen_input_ids"]) <= 800 and len(x["trejected_input_ids"]) <= 800 and len(x['tprompdt_ids']) <= 300)
+
+    
     print(train_dataset[0])
 
     print(train_dataset[1])
-
+    print(len(train_dataset), len(eval_dataset))
 
     print(train_dataset[14124])
     # 4. initialize training arguments:
@@ -214,7 +233,24 @@ if __name__ == "__main__":
         remove_unused_columns=False,
         run_name="dpo_test",
     )
-
+    '''
+    peft_config = LoraConfig(
+        r=script_args.lora_r,
+        lora_alpha=script_args.lora_alpha,
+        lora_dropout=script_args.lora_dropout,
+        target_modules=[
+            "q_proj",
+            "v_proj",
+            "k_proj",
+            "out_proj",
+            "fc_in",
+            "fc_out",
+            "wte",
+        ],
+        bias="none",
+        task_type="CAUSAL_LM",
+    )
+    '''
     print("22222")
     # 5. initialize the DPO trainer
 #    optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=script_args.learning_rate)
@@ -227,7 +263,6 @@ if __name__ == "__main__":
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         tokenizer=tokenizer,
-        loss_type=script_args.loss_type,
         #optimizers=optimizer,
         #peft_config=peft_config,
         max_prompt_length=script_args.max_prompt_length,
