@@ -52,7 +52,7 @@ class ScriptArguments:
             gradient_accumulation_steps=1,
             gradient_checkpointing=True,
             learning_rate=1.41e-5,
-            report_to="tensorboard",
+            report_to="wandb",
             remove_unused_columns=False,
             optim="adamw_torch",
             logging_steps=500,
