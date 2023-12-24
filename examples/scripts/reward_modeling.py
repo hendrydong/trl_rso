@@ -15,12 +15,12 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-import tyro
+
 from accelerate import Accelerator
 from datasets import load_dataset
 from peft import LoraConfig
 from tqdm import tqdm
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, BitsAndBytesConfig
+from transformers import HfArgumentParser,AutoModelForSequenceClassification, AutoTokenizer, BitsAndBytesConfig
 
 from trl import RewardConfig, RewardTrainer
 import torch
@@ -74,7 +74,8 @@ class ScriptArguments:
     )
 
 
-args = tyro.cli(ScriptArguments)
+parser = HfArgumentParser(ScriptArguments)
+args = parser.parse_args_into_dataclasses()[0]
 args.reward_config.evaluation_strategy = "steps" if args.eval_split != "none" else "no"
 
 
