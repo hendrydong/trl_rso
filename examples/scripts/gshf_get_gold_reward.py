@@ -135,7 +135,7 @@ print(len(responses_pos), len(responses_neg))
 N = len(responses_neg)
 
 
-model, optimizer = accelerator.prepare(
+model = accelerator.prepare(
     model
 )
 
