@@ -88,16 +88,13 @@ generation_kwargs = {
 }
 
 
-def _clean_text(inputs):
-    text = inputs["text"]
-    print(text)
+def _clean_text(text):
     
     if len(text) == 0:
         return text
     stext = [x for x in text.split("###Human") if x]
-    print(stext)
-    inputs["text"] = stext[0].strip().replace("#", "").replace("<s>", "").replace("</s>", "")
-    return inputs
+
+    return stext[0].strip().replace("#", "").replace("<s>", "").replace("</s>", "")
 
 
 def tokenize_fn(samples):
@@ -146,11 +143,11 @@ prompts_set = {}
 
 for i in range(len(prompts)):
     if prompts[i] not in prompts_set:
-        tmp_data = {"input": prompts[i], "output": [responses[i]]}
+        tmp_data = {"input": prompts[i], "output": [_clean_text(responses[i])]}
         gathered_data.append(tmp_data)   
         prompts_set[prompts[i]] = len(gathered_data)
     else:
-        gathered_data[prompts_set[prompts[i]]]["output"].append(responses[i])
+        gathered_data[prompts_set[prompts[i]]-1]["output"].append(_clean_text(responses[i]))
 output_eval_dataset = {}
 output_eval_dataset['type'] = 'text_only'
 output_eval_dataset['instances'] = gathered_data
