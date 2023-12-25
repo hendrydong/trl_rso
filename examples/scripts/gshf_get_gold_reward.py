@@ -206,6 +206,7 @@ import json
 
 
 if local_rank == 0:
+    print("Mean reward: ", np.mean(scores))
     with open(output_dir, 'w', encoding='utf8') as f:
         json.dump(output_eval_dataset, f, ensure_ascii=False)
 
