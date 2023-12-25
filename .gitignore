@@ -144,3 +144,5 @@ checklink/cookies.txt
 nbs/wandb/
 examples/notebooks/wandb/
 wandb/
+v1.json
+examples/scripts/my_gen.json

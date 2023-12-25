@@ -31,7 +31,7 @@ model_name = "gpt2"
 output_dir = "./my_gen.json"
 K = 2
 infer_batch_size = 64
-max_tokens = 128
+max_tokens = 10
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 tokenizer.pad_token = tokenizer.eos_token
