@@ -186,18 +186,20 @@ world_size = int(os.getenv("WORLD_SIZE", "1"))
 all_process_list =[{}] * world_size
 
 data_to_send = {
-    'data': [[data[i]] for i in range(len(data))]
+    'data': [[data[i]] for i in range(len(data))],
+    'scores': scores
 }
 
 import torch.distributed as dist
 
 dist.all_gather_object(all_process_list, data_to_send)
 gathered_data = []
-
+gathered_scores = []
 
 for i in range(world_size):
     tmp_data = [tmp[0] for tmp in all_process_list[i]['data']]
     gathered_data.extend(tmp_data)   
+    gathered_scores += all_process_list[i]['scores']
     
 output_eval_dataset = {}
 output_eval_dataset['type'] = 'text_only'
@@ -206,7 +208,7 @@ import json
 
 
 if local_rank == 0:
-    print("Mean reward: ", np.mean(scores))
+    print("Mean reward: ", np.mean(gathered_scores))
     with open(output_dir, 'w', encoding='utf8') as f:
         json.dump(output_eval_dataset, f, ensure_ascii=False)
 
