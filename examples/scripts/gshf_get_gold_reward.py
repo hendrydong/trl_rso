@@ -127,12 +127,10 @@ local_rank = Accelerator().local_process_index
 data_size = len(ds['input'])
 share = int(data_size / world_size) 
 ds = ds.select(np.arange(local_rank * share, (local_rank + 1)*share))
-responses_pos = [sample['input'] + sample['output'][0] for sample in ds]
-responses_neg =  [sample['input'] + sample['output'][1] for sample in ds]
 
 
-print(len(responses_pos), len(responses_neg))
-N = len(responses_neg)
+
+#N = len(responses_neg)
 
 
 model = accelerator.prepare(
@@ -170,7 +168,8 @@ def change_of_format(txt):
 cnt = 0
 
 for sample in ds:
-    test_texts = [change_of_format(sample['input'] + sample['output'][0]), change_of_format(sample['input'] + sample['output'][1])]
+    len_output = len(sample['output'])
+    test_texts = [change_of_format(sample['input'] + sample['output'][i]) for i in range(len_output)]
     rewards = get_reward(test_texts)
     data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
     cnt += 1
