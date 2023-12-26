@@ -68,7 +68,7 @@ parser = HfArgumentParser(ScriptArguments)
 script_args = parser.parse_args_into_dataclasses()[0]
 
 print(script_args)
-print("delimiter:"+script_args.input_output_delimiter)
+print("delimiter:'"+script_args.input_output_delimiter+"'")
 
 AcceleratorState().deepspeed_plugin.deepspeed_config['train_micro_batch_size_per_gpu'] = script_args.train_micro_batch_size_per_gpu
 
