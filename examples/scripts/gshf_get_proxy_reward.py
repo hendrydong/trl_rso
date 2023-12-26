@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from accelerate import Accelerator
 from accelerate.state import AcceleratorState
 import torch.distributed as dist
-
+from tqdm import tqdm
 
 @dataclass
 class ScriptArguments:
@@ -139,7 +139,8 @@ data = []
 
 cnt = 0
 
-for sample in ds:
+# tqdm is used to show the progress bar
+for sample in tqdm(ds):
     test_texts = [sample['input'] + script_args.input_output_delimiter + tmp_output for tmp_output in sample['output']]
     rewards = get_reward(test_texts)
     data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
