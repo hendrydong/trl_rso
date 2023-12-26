@@ -146,8 +146,6 @@ for sample in tqdm(ds):
     rewards = get_reward(test_texts)
     data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
     cnt += 1
-    if (cnt + 1) % 100 == 0:
-        print(cnt)
     if rewards[0] > -1000:
         scores.append(rewards[0])
 
