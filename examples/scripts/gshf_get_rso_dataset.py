@@ -4,7 +4,7 @@ import sys
 import json
 import time
 from dataclasses import dataclass, field
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 # Third-party library imports
 import numpy as np
