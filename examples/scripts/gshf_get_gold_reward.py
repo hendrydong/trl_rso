@@ -211,7 +211,7 @@ for i in range(world_size):
     
 output_eval_dataset = {}
 output_eval_dataset['type'] = 'text_only'
-output_eval_dataset['instances'] = data
+output_eval_dataset['instances'] = gathered_data
 import json
 
 
