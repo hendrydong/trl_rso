@@ -4,64 +4,21 @@ from transformers import (
     default_data_collator,
     pipeline,
     set_seed,
-    AutoTokenizer,
-    HfArgumentParser
+    AutoTokenizer
 )
 import sys
 import os
-from dataclasses import dataclass, field
+
 import numpy as np
 import matplotlib.pyplot as plt
+# 获取命令行参数列表
 from accelerate import Accelerator
 from accelerate.state import AcceleratorState
 import torch.distributed as dist
 
-
-@dataclass
-class ScriptArguments:
-    """
-    The arguments for the DPO training script.
-    """
-    json_path: Optional[str] = field(
-        default="1000.json",
-        metadata={"help": "the location of the dataset name or path"},
-    )
-    output_dir: Optional[str] = field(
-        default="gen.json",
-        metadata={"help": "the location of the output file"},
-    )
-    train_micro_batch_size_per_gpu: Optional[int] = field(
-        default=4,
-        metadata={"help": "the batch size for inference"},
-    )
-    max_length: Optional[int] = field(
-        default=9999999999,
-        metadata={"help": "the maximum length of the prompt"},
-    )
-    proxy_reward_name_or_path: Optional[str] = field(
-        default="relabel_by_gold13b_genby3b_if_rm_open_llama_3b_v2_if_1epoch_hh_2e5_2epoch_exp1",
-        metadata={"help": "the name of the gold reward model"},
-    )
-    input_output_delimiter: Optional[str] = field(
-        default=" ",
-        metadata={"help": "the delimiter between input and output"},
-    )
-
-
-
-
-
-
-
-parser = HfArgumentParser(ScriptArguments)
-script_args = parser.parse_args_into_dataclasses()[0]
-
-
-
-
 accelerator = Accelerator()
 
-AcceleratorState().deepspeed_plugin.deepspeed_config['train_micro_batch_size_per_gpu'] = script_args.train_micro_batch_size_per_gpu
+AcceleratorState().deepspeed_plugin.deepspeed_config['train_micro_batch_size_per_gpu'] = 4
 
 
 #####
@@ -75,9 +32,9 @@ AcceleratorState().deepspeed_plugin.deepspeed_config['train_micro_batch_size_per
 #
 #
 
-ds_dir = script_args.json_path#"/home/xiongwei/over_opt/LMFlow_RAFT_Dev/output_models/forgetting_proj/over_opt_raft3b_get_samples_by_if_model_max512/model0/infer_set/my_infer_set.json"
-output_dir = script_args.output_dir#"/home/xiongwei/gshf_gen_data/LMFlow_RAFT_Dev/data/my_filtered_set.json"
-reward_model = script_args.proxy_reward_name_or_path#"/home/xiongwei/rm_study/LMFlow/output_models/gold_rm_7b_lora_1e4_bz16_with_2epoch_sft_boundary_loss5/merged_rm"
+ds_dir = "/home/xiongwei/over_opt/LMFlow_RAFT_Dev/output_models/forgetting_proj/over_opt_raft3b_get_samples_by_if_model_max512/model0/infer_set/my_infer_set.json"
+output_dir = "/home/xiongwei/gshf_gen_data/LMFlow_RAFT_Dev/data/my_filtered_set.json"
+reward_model = "/home/xiongwei/rm_study/LMFlow/output_models/gold_rm_7b_lora_1e4_bz16_with_2epoch_sft_boundary_loss5/merged_rm"
 from transformers import PreTrainedModel, LlamaConfig, LlamaModel, LlamaTokenizer
 import torch.nn as nn
 import torch
@@ -140,7 +97,7 @@ data = []
 cnt = 0
 
 for sample in ds:
-    test_texts = [sample['input'] + script_args.input_output_delimiter + tmp_output for tmp_output in sample['output']]
+    test_texts = [sample['input'] +  tmp_output for tmp_output in sample['output']]
     rewards = get_reward(test_texts)
     data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
     cnt += 1
