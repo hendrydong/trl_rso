@@ -50,6 +50,11 @@ class ScriptArguments:
         default="openbmb/UltraRM-13b",
         metadata={"help": "the name of the gold reward model"},
     )
+    input_output_delimiter: Optional[str] = field(
+        default="",
+        metadata={"help": "the delimiter between input and output"},
+    )
+
 
 
 
@@ -169,7 +174,7 @@ cnt = 0
 
 for sample in ds:
     len_output = len(sample['output'])
-    test_texts = [change_of_format(sample['input'] + sample['output'][i]) for i in range(len_output)]
+    test_texts = [change_of_format(sample['input'] +script_args.input_output_delimiter+ sample['output'][i]) for i in range(len_output)]
     rewards = get_reward(test_texts)
     data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
     cnt += 1
