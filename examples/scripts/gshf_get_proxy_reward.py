@@ -7,6 +7,7 @@ from transformers import (
     AutoTokenizer,
     HfArgumentParser
 )
+from typing import Optional, List
 import sys
 import os
 from dataclasses import dataclass, field
@@ -81,7 +82,7 @@ reward_model = script_args.proxy_reward_name_or_path#"/home/xiongwei/rm_study/LM
 from transformers import PreTrainedModel, LlamaConfig, LlamaModel, LlamaTokenizer
 import torch.nn as nn
 import torch
-from typing import Optional, List
+
 
 device = accelerator.device
 
