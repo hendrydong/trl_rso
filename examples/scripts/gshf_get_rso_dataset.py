@@ -125,6 +125,34 @@ def tournament_ranking(responses: List[str], rewards: List[float]):
     
     return chosen, rejected
 
+def random_ranking(responses: List[str], rewards: List[float]):
+    """Conducts random ranking. 
+    
+    Args:
+        responses: accecpted candidates from rejection sampling.
+        rewards: response rewards.
+        
+    Returns:
+        chosen: chosen samples.
+        rejected: rejected samples.
+    """
+    chosen = []
+    rejected = []
+    
+    def pick(responses):
+        selected = random.randrange(len(responses))
+        return responses.pop(selected)
+    
+    responses = [(response, reward) for response, reward in zip(responses,rewards)]
+    while responses:
+        selected1 = pick(responses)
+        selected2 = pick(responses)
+        
+        chosen.append(selected1[0])
+        rejected.append(selected2[0])
+            
+    return chosen, rejected
+
 
 parser = HfArgumentParser(ScriptArguments)
 script_args = parser.parse_args_into_dataclasses()[0]
@@ -172,6 +200,8 @@ for sample in ds:
         ranking_fn = first_round_ranking
     elif script_args.ranking_type == "tournament":
         ranking_fn = tournament_ranking
+    elif script_args.ranking_type == "random":
+        ranking_fn = random_ranking
     chosen, rejected = ranking_fn(accpted, rewards)
 
     assert len(chosen) == len(rejected)
