@@ -119,7 +119,7 @@ ds = load_dataset("json", data_files=ds_dir, split="train", field="instances")
 
 data_size0 = len(ds['input'])
 
-ds = ds.map(tokenize, batched=False)
+ds = ds.map(tokenize, batched=True)
 ds = ds.filter(lambda x: len(x["input_ids"]) + len(x["output_ids"]) <= script_args.max_length)
 
 zz = 0
