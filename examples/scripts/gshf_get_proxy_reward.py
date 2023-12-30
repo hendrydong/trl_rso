@@ -32,7 +32,7 @@ class ScriptArguments:
         metadata={"help": "the location of the output file"},
     )
     max_length: Optional[int] = field(
-        default=9999999999,
+        default=1024,
         metadata={"help": "the maximum length of the prompt"},
     )
     proxy_reward_name_or_path: Optional[str] = field(
@@ -103,12 +103,25 @@ pipe_kwargs = {
     "batch_size": 1,
 }
 
+def tokenize(sample):
+    tokenized_input = rm_tokenizer(sample['input'])
+    tokenized_output = rm_tokenizer(sample['output'])
+    sample["input_ids"] = tokenized_input["input_ids"]
+    sample["output_ids"] = tokenized_output["input_ids"]
+    return sample
 
+#ds = load_dataset("json", data_files=config.dataset_path, split="train", field="instances")
 
 world_size = int(os.getenv("WORLD_SIZE", "1"))
 ####
 
 ds = load_dataset("json", data_files=ds_dir, split="train", field="instances")
+
+data_size0 = len(ds['input'])
+
+ds = ds.map(tokenize, batched=False)
+ds = ds.filter(lambda x: len(x["input_ids"]) + len(x["output_ids"]) <= script_args.max_length)
+
 zz = 0
 for sample in ds:
     print(sample['input'] + sample['output'][0])
@@ -118,6 +131,7 @@ for sample in ds:
 local_rank = Accelerator().local_process_index
 
 data_size = len(ds['input'])
+print("data_size:", data_size, "data_size0:", data_size0)
 share = int(data_size / world_size) 
 ds = ds.select(np.arange(local_rank * share, (local_rank + 1)*share))
 responses_pos = [sample['input'] + sample['output'][0] for sample in ds]
