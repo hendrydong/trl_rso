@@ -31,8 +31,8 @@ class ScriptArguments:
         default="gen.json",
         metadata={"help": "the location of the output file"},
     )
-    max_length: Optional[int] = field(
-        default=1024,
+    max_char_length: Optional[int] = field(
+        default=2048,
         metadata={"help": "the maximum length of the prompt"},
     )
     proxy_reward_name_or_path: Optional[str] = field(
@@ -119,8 +119,10 @@ ds = load_dataset("json", data_files=ds_dir, split="train", field="instances")
 
 data_size0 = len(ds['input'])
 
-ds = ds.map(tokenize, batched=True)
-ds = ds.filter(lambda x: len(x["input_ids"]) + len(x["output_ids"]) <= script_args.max_length)
+#ds = ds.map(tokenize, batched=False)
+ds = ds.filter(lambda x: len(x["input"]) + len(x["input"]) <= script_args.max_char_length)
+
+
 
 zz = 0
 for sample in ds:
@@ -132,6 +134,7 @@ local_rank = Accelerator().local_process_index
 
 data_size = len(ds['input'])
 print("data_size:", data_size, "data_size0:", data_size0)
+raise
 share = int(data_size / world_size) 
 ds = ds.select(np.arange(local_rank * share, (local_rank + 1)*share))
 responses_pos = [sample['input'] + sample['output'][0] for sample in ds]
