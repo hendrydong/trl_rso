@@ -32,7 +32,7 @@ class ScriptArguments:
         metadata={"help": "the location of the output file"},
     )
     max_char_length: Optional[int] = field(
-        default=999999999,
+        default=4096,
         metadata={"help": "the maximum length of the prompt"},
     )
     proxy_reward_name_or_path: Optional[str] = field(
@@ -120,20 +120,13 @@ ds = load_dataset("json", data_files=ds_dir, split="train", field="instances")
 data_size0 = len(ds['input'])
 
 #ds = ds.map(tokenize, batched=False)
-ds = ds.filter(lambda x: len(x["input"]) + len(x["input"]) <= script_args.max_char_length)
+ds = ds.filter(lambda x: len(x["input"]) + len(x["output"]) <= script_args.max_char_length)
 
 
-
-zz = 0
-for sample in ds:
-    print(sample['input'] + sample['output'][0])
-    zz += 1
-    if zz > 10:
-        break
 local_rank = Accelerator().local_process_index
 
 data_size = len(ds['input'])
-print("data_size:", data_size, "data_size0:", data_size0)
+print("data_size:", data_size, "data_size0:", data_size0, "local_rank:", local_rank, "world_size:", world_size)
 
 share = int(data_size / world_size) 
 ds = ds.select(np.arange(local_rank * share, (local_rank + 1)*share))
@@ -159,14 +152,8 @@ cnt = 0
 with torch.no_grad():
     for sample in tqdm(ds):
         test_texts = [sample['input'] + script_args.input_output_delimiter + tmp_output for tmp_output in sample['output']]
-        try:
-            rewards = get_reward(test_texts)
-        except RuntimeError:
-            # save test_texts to a file
-            with open(f"error_{cnt}.txt", "w") as f:
-                for tmp in test_texts:
-                    f.write(tmp + "\n")
-            continue
+        rewards = get_reward(test_texts)
+
         data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
         cnt += 1
         if rewards[0] > -1000:
