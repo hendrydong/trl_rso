@@ -31,7 +31,7 @@ class ScriptArguments:
         default="gen.json",
         metadata={"help": "the location of the output file"},
     )
-    train_micro_batch_size_per_gpu: Optional[int] = field(
+    batch_size: Optional[int] = field(
         default=4,
         metadata={"help": "the batch size for inference"},
     )
@@ -65,7 +65,6 @@ script_args = parser.parse_args_into_dataclasses()[0]
 
 accelerator = Accelerator()
 
-AcceleratorState().deepspeed_plugin.deepspeed_config['train_micro_batch_size_per_gpu'] = script_args.train_micro_batch_size_per_gpu
 
 
 #####
@@ -105,7 +104,7 @@ rm_pipe = pipeline(
 pipe_kwargs = {
     "return_all_scores": True,
     "function_to_apply": "none",
-    "batch_size": 1
+    "batch_size": script_args.batch_size,
 }
 
 
