@@ -94,7 +94,7 @@ rm_pipe = pipeline(
     model=reward_model,
     device=device,
     tokenizer=rm_tokenizer,
-    model_kwargs={"torch_dtype": torch.bfloat16}
+    model_kwargs={"torch_dtype": torch.bfloat16},
     tokenizer_kwargs = {"truncation": True}
 )
 
