@@ -31,10 +31,6 @@ class ScriptArguments:
         default="gen.json",
         metadata={"help": "the location of the output file"},
     )
-    batch_size: Optional[int] = field(
-        default=4,
-        metadata={"help": "the batch size for inference"},
-    )
     max_length: Optional[int] = field(
         default=9999999999,
         metadata={"help": "the maximum length of the prompt"},
@@ -104,7 +100,7 @@ rm_pipe = pipeline(
 pipe_kwargs = {
     "return_all_scores": True,
     "function_to_apply": "none",
-    "batch_size": script_args.batch_size,
+    "batch_size": 1,
 }
 
 
@@ -151,8 +147,11 @@ cnt = 0
 with torch.no_grad():
     for sample in tqdm(ds):
         test_texts = [sample['input'] + script_args.input_output_delimiter + tmp_output for tmp_output in sample['output']]
-
-        rewards = get_reward(test_texts)
+        try:
+            rewards = get_reward(test_texts)
+        except RuntimeError:
+            np.savetxt(f"error_{cnt}.txt", test_texts)
+            continue
         data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
         cnt += 1
         if rewards[0] > -1000:
