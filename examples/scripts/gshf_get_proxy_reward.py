@@ -152,10 +152,14 @@ cnt = 0
 with torch.no_grad():
     for sample in tqdm(ds):
         test_texts = [sample['input'] + script_args.input_output_delimiter + tmp_output for tmp_output in sample['output']]
-        rewards = get_reward(test_texts)
-
-        data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
-        cnt += 1
+        try:
+            rewards = get_reward(test_texts)
+            data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
+            cnt += 1
+        except RuntimeError:
+            with open(f"error_{cnt}.txt", "w") as f:
+                for tmp in test_texts:
+                    f.write(tmp + "\n")
         if rewards[0] > -1000:
             scores.append(rewards[0])
 
@@ -169,6 +173,7 @@ all_process_list =[{}] * world_size
 data_to_send = {
     'data': [[data[i]] for i in range(len(data))]
 }
+torch.distributed.barrier()
 dist.all_gather_object(all_process_list, data_to_send)
 gathered_data = []
 
