@@ -43,6 +43,9 @@ class ScriptArguments:
         default="relabel_by_gold13b_genby3b_if_rm_open_llama_3b_v2_if_1epoch_hh_2e5_2epoch_exp1",
         metadata={"help": "the name of the gold reward model"},
     )
+    proxy_reward_tokenizer_name_or_path: Optional[str] = field(
+        default=""
+    )
     input_output_delimiter: Optional[str] = field(
         default=" ",
         metadata={"help": "the delimiter between input and output"},
@@ -86,8 +89,10 @@ import torch
 
 device = accelerator.device
 
-
-rm_tokenizer = AutoTokenizer.from_pretrained(reward_model)
+if script_args.proxy_reward_tokenizer_name_or_path == "":
+    rm_tokenizer = AutoTokenizer.from_pretrained(reward_model)
+else:
+    rm_tokenizer = AutoTokenizer.from_pretrained(script_args.proxy_reward_tokenizer_name_or_path)
 
 rm_pipe = pipeline(
     "sentiment-analysis",
