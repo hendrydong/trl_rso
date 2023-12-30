@@ -133,8 +133,11 @@ N = len(responses_neg)
 
 
 def get_reward(test_texts):
-
-    pipe_outputs = rm_pipe(test_texts, **pipe_kwargs)
+    try:
+        pipe_outputs = rm_pipe(test_texts, **pipe_kwargs)
+    except RuntimeError:
+        print("RuntimeError",test_texts)
+        raise RuntimeError
     rewards = [output[0]["score"] for output in pipe_outputs]
 
     return rewards
@@ -149,6 +152,7 @@ cnt = 0
 with torch.no_grad():
     for sample in tqdm(ds):
         test_texts = [sample['input'] + script_args.input_output_delimiter + tmp_output for tmp_output in sample['output']]
+
         rewards = get_reward(test_texts)
         data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
         cnt += 1
