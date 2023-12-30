@@ -31,10 +31,10 @@ class ScriptArguments:
         default="gen.json",
         metadata={"help": "the location of the output file"},
     )
-    max_length: Optional[int] = field(
-        default=2048,
-        metadata={"help": "the maximum length of the prompt"},
-    )
+    #max_length: Optional[int] = field(
+    #    default=2048,
+    #    metadata={"help": "the maximum length of the prompt"},
+    #)
     proxy_reward_name_or_path: Optional[str] = field(
         default="relabel_by_gold13b_genby3b_if_rm_open_llama_3b_v2_if_1epoch_hh_2e5_2epoch_exp1",
         metadata={"help": "the name of the gold reward model"},
@@ -120,8 +120,8 @@ ds = load_dataset("json", data_files=ds_dir, split="train", field="instances")
 
 data_size0 = len(ds['input'])
 
-ds = ds.map(tokenize, batched=False)
-ds = ds.filter(lambda x: len(x["input"]) + len(x["output"]) <= script_args.max_length)
+#ds = ds.map(tokenize, batched=False)
+#ds = ds.filter(lambda x: len(x["input"]) + len(x["output"]) <= script_args.max_length)
 
 
 local_rank = Accelerator().local_process_index
