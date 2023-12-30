@@ -134,7 +134,7 @@ local_rank = Accelerator().local_process_index
 
 data_size = len(ds['input'])
 print("data_size:", data_size, "data_size0:", data_size0)
-raise
+
 share = int(data_size / world_size) 
 ds = ds.select(np.arange(local_rank * share, (local_rank + 1)*share))
 responses_pos = [sample['input'] + sample['output'][0] for sample in ds]
