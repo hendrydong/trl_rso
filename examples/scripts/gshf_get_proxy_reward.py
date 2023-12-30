@@ -32,7 +32,7 @@ class ScriptArguments:
         metadata={"help": "the location of the output file"},
     )
     max_char_length: Optional[int] = field(
-        default=2048,
+        default=999999999,
         metadata={"help": "the maximum length of the prompt"},
     )
     proxy_reward_name_or_path: Optional[str] = field(
@@ -145,13 +145,8 @@ N = len(responses_neg)
 
 
 def get_reward(test_texts):
-    try:
-        pipe_outputs = rm_pipe(test_texts, **pipe_kwargs)
-    except RuntimeError:
-        print("RuntimeError",test_texts)
-        raise RuntimeError
+    pipe_outputs = rm_pipe(test_texts, **pipe_kwargs)
     rewards = [output[0]["score"] for output in pipe_outputs]
-
     return rewards
 
 scores = []
