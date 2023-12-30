@@ -59,7 +59,7 @@ class ScriptArguments:
     logging_steps: Optional[int] = field(default=2, metadata={"help": "the logging frequency"})
     save_steps: Optional[int] = field(default=940, metadata={"help": "the saving frequency"})
     eval_steps: Optional[int] = field(default=940, metadata={"help": "the evaluation frequency"})
-
+    run_name: Optional[str] = field(default="dpo_test", metadata={"help": "the run name"})
     output_dir: Optional[str] = field(default="/home/xiongwei/over_opt/LMFlow_RAFT_Dev/output_models/forgetting_proj/dpo2", metadata={"help": "the output directory"})
     log_freq: Optional[int] = field(default=1, metadata={"help": "the logging frequency"})
 
@@ -231,7 +231,7 @@ if __name__ == "__main__":
         #optim=script_args.optimizer_type,
         bf16=True,
         remove_unused_columns=False,
-        run_name="dpo_test",
+        run_name=script_args.run_name,
     )
     '''
     peft_config = LoraConfig(
