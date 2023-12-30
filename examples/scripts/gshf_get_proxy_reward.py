@@ -31,8 +31,8 @@ class ScriptArguments:
         default="gen.json",
         metadata={"help": "the location of the output file"},
     )
-    max_char_length: Optional[int] = field(
-        default=4096,
+    max_length: Optional[int] = field(
+        default=2048,
         metadata={"help": "the maximum length of the prompt"},
     )
     proxy_reward_name_or_path: Optional[str] = field(
@@ -95,6 +95,7 @@ rm_pipe = pipeline(
     device=device,
     tokenizer=rm_tokenizer,
     model_kwargs={"torch_dtype": torch.bfloat16}
+    tokenizer_kwargs = {"truncation": True}
 )
 
 pipe_kwargs = {
@@ -119,8 +120,8 @@ ds = load_dataset("json", data_files=ds_dir, split="train", field="instances")
 
 data_size0 = len(ds['input'])
 
-#ds = ds.map(tokenize, batched=False)
-ds = ds.filter(lambda x: len(x["input"]) + len(x["output"]) <= script_args.max_char_length)
+ds = ds.map(tokenize, batched=False)
+ds = ds.filter(lambda x: len(x["input"]) + len(x["output"]) <= script_args.max_length)
 
 
 local_rank = Accelerator().local_process_index
@@ -156,12 +157,13 @@ with torch.no_grad():
             rewards = get_reward(test_texts)
             data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
             cnt += 1
+            if rewards[0] > -1000:
+                scores.append(rewards[0])
         except RuntimeError:
             with open(f"error_{cnt}.txt", "w") as f:
                 for tmp in test_texts:
                     f.write(tmp + "\n")
-        if rewards[0] > -1000:
-            scores.append(rewards[0])
+        
 
 
 print("mean scores", np.mean(scores))
