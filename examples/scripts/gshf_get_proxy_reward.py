@@ -146,13 +146,14 @@ data = []
 cnt = 0
 
 # tqdm is used to show the progress bar
-for sample in tqdm(ds):
-    test_texts = [sample['input'] + script_args.input_output_delimiter + tmp_output for tmp_output in sample['output']]
-    rewards = get_reward(test_texts)
-    data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
-    cnt += 1
-    if rewards[0] > -1000:
-        scores.append(rewards[0])
+with torch.no_grad():
+    for sample in tqdm(ds):
+        test_texts = [sample['input'] + script_args.input_output_delimiter + tmp_output for tmp_output in sample['output']]
+        rewards = get_reward(test_texts)
+        data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
+        cnt += 1
+        if rewards[0] > -1000:
+            scores.append(rewards[0])
 
 
 print("mean scores", np.mean(scores))
