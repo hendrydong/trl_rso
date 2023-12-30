@@ -150,7 +150,10 @@ with torch.no_grad():
         try:
             rewards = get_reward(test_texts)
         except RuntimeError:
-            np.savetxt(f"error_{cnt}.txt", test_texts)
+            # save test_texts to a file
+            with open(f"error_{cnt}.txt", "w") as f:
+                for tmp in test_texts:
+                    f.write(tmp + "\n")
             continue
         data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
         cnt += 1
