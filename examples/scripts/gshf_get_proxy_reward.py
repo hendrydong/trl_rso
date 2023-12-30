@@ -95,7 +95,7 @@ rm_pipe = pipeline(
     device=device,
     tokenizer=rm_tokenizer,
     model_kwargs={"torch_dtype": torch.bfloat16},
-    tokenizer_kwargs = {"truncation": True}
+    truncation=True
 )
 
 pipe_kwargs = {
