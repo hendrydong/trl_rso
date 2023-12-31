@@ -189,11 +189,10 @@ print("After filtering incomplete and short responses", len(ds))
 data = []
 cnt = 0
 for sample in ds:
-    if np.min(sample['rewards']) < -999:
+    if np.min(sample['rewards']) < -999 or np.min(sample['rewards']) == np.max(sample['rewards']):
         cnt += 1
         continue
-    if len(sample["output"])>=script_args.num_samples_per_prompt:
-        print(len(sample["output"]),len(sample["rewards"]),sample["rewards"])
+    if len(sample["output"])>=script_args.num_samples_per_prompt and max():
         accepted, rewards = conduct_rejection_sampling(sample["output"],
                                     sample["rewards"], 
                                     script_args.num_samples_per_prompt, 
