@@ -193,6 +193,7 @@ for sample in ds:
         cnt += 1
         continue
     if len(sample["output"])>=script_args.num_samples_per_prompt:
+        print(len(sample["output"]),len(sample["rewards"]))
         accepted, rewards = conduct_rejection_sampling(sample["output"],
                                     sample["rewards"], 
                                     script_args.num_samples_per_prompt, 
