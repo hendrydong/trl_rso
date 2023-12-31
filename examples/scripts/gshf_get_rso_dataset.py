@@ -192,23 +192,24 @@ for sample in ds:
     if np.min(sample['rewards']) < -999:
         cnt += 1
         continue
-    accpted, rewards = conduct_rejection_sampling(sample["output"],
-                                sample["rewards"], 
-                                script_args.num_samples_per_prompt, 
-                                script_args.beta)
-    if script_args.ranking_type == "first_round":
-        ranking_fn = first_round_ranking
-    elif script_args.ranking_type == "tournament":
-        ranking_fn = tournament_ranking
-    elif script_args.ranking_type == "random":
-        ranking_fn = random_ranking
-    chosen, rejected = ranking_fn(accpted, rewards)
+    if len(sample["output"])>0:
+        accepted, rewards = conduct_rejection_sampling(sample["output"],
+                                    sample["rewards"], 
+                                    script_args.num_samples_per_prompt, 
+                                    script_args.beta)
+        if script_args.ranking_type == "first_round":
+            ranking_fn = first_round_ranking
+        elif script_args.ranking_type == "tournament":
+            ranking_fn = tournament_ranking
+        elif script_args.ranking_type == "random":
+            ranking_fn = random_ranking
+        chosen, rejected = ranking_fn(accepted, rewards)
 
-    assert len(chosen) == len(rejected)
+        assert len(chosen) == len(rejected)
 
-    for i in range(len(chosen)):
-        data.append({"positive": sample['input'] + script_args.input_output_delimiter + chosen[i],
-                      "negative": sample['input'] + script_args.input_output_delimiter + rejected[i]})
+        for i in range(len(chosen)):
+            data.append({"positive": sample['input'] + script_args.input_output_delimiter + chosen[i],
+                        "negative": sample['input'] + script_args.input_output_delimiter + rejected[i]})
 
     #if sample['rewards'][0] > sample['rewards'][1]:
     #    data.append({"positive": sample['input'] + sample['output'][0], "negative": sample['input'] + sample['output'][1]})
