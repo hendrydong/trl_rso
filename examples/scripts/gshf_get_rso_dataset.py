@@ -192,7 +192,7 @@ for sample in ds:
     if np.min(sample['rewards']) < -999:
         cnt += 1
         continue
-    if len(sample["output"])>0:
+    if len(sample["output"])>=script_args.num_samples_per_prompt:
         accepted, rewards = conduct_rejection_sampling(sample["output"],
                                     sample["rewards"], 
                                     script_args.num_samples_per_prompt, 
