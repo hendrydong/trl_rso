@@ -137,7 +137,10 @@ ds = load_dataset("json", data_files=ds_dir, split="train", field="instances")
 
 local_rank = Accelerator().local_process_index
 
-data_size = len(ds['input'])
+if not script_args.perference_data:
+    data_size = len(ds['input'])
+else:
+    data_size = len(ds['positive'])
 share = int(data_size / world_size) 
 ds = ds.select(np.arange(local_rank * share, (local_rank + 1)*share))
 
