@@ -54,6 +54,10 @@ class ScriptArguments:
         default="",
         metadata={"help": "the delimiter between input and output"},
     )
+    perference_data: Optional[bool] = field(
+        default=False,
+        metadata={"help": "whether the input and output are paired"},
+    )
 
 
 
@@ -176,17 +180,33 @@ def change_of_format(txt):
 
 cnt = 0
 
-for sample in ds:
-    len_output = len(sample['output'])
-    test_texts = [change_of_format(sample['input'] +script_args.input_output_delimiter+ sample['output'][i]) for i in range(len_output)]
-    rewards = get_reward(test_texts)
-    data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
-    cnt += 1
-    if (cnt + 1) % 100 == 0:
-        print(cnt+1,np.mean(scores))
-    if rewards[0] > -1000:
-        scores.append(rewards[0])
-
+if not script_args.perference_data:
+    for sample in ds:
+        len_output = len(sample['output'])
+        test_texts = [change_of_format(sample['input'] +script_args.input_output_delimiter+ sample['output'][i]) for i in range(len_output)]
+        rewards = get_reward(test_texts)
+        data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
+        cnt += 1
+        if (cnt + 1) % 100 == 0:
+            print(cnt+1,np.mean(scores))
+        if rewards[0] > -1000:
+            scores.append(rewards[0])
+else:
+    pos_scores = []
+    neg_scores = []
+    for sample in ds:
+        
+        test_texts = [change_of_format(sample['positive']),change_of_format(sample['negative'])]
+        rewards = get_reward(test_texts)
+        data.append({"positive": sample['positive'], "negative": sample['negative'], "rewards": rewards})
+        cnt += 1
+        if (cnt + 1) % 100 == 0:
+            print(cnt+1,np.mean(scores))
+        if rewards[0] > -1000:
+            pos_scores.append(rewards[0])
+            neg_scores.append(rewards[1])
+            scores.append(rewards[0])
+            scores.append(rewards[1])
 
 
 #### Send the data to other GPUs
@@ -217,6 +237,9 @@ import json
 
 if local_rank == 0:
     print("Mean reward: ", np.mean(gathered_scores))
+    if script_args.perference_data:
+        print("Mean pos reward: ", np.mean(pos_scores))
+        print("Mean neg reward: ", np.mean(neg_scores))
     with open(output_dir, 'w', encoding='utf8') as f:
         json.dump(output_eval_dataset, f, ensure_ascii=False)
 
