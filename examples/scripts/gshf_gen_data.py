@@ -55,6 +55,10 @@ class ScriptArguments:
         default=10,
         metadata={"help": "the maximum length of the new tokens"},
     )
+    seed: Optional[int] = field(
+        default=42,
+        metadata={"help": "the random seed"},
+    )
 
 
 
@@ -84,7 +88,8 @@ generation_kwargs = {
     "pad_token_id": tokenizer.eos_token_id,
     "temperature": 1.0,
     "num_return_sequences": script_args.K,
-    "max_new_tokens": script_args.max_new_tokens
+    "max_new_tokens": script_args.max_new_tokens,
+    "seed": script_args.seed,
 }
 
 
@@ -93,7 +98,6 @@ def _clean_text(text):
     if len(text) == 0:
         return text
     stext = [x for x in text.split("###Human") if x]
-
     return stext[0].strip().replace("#", "").replace("<s>", "").replace("</s>", "")
 
 
