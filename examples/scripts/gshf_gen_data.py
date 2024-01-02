@@ -89,7 +89,6 @@ generation_kwargs = {
     "temperature": 1.0,
     "num_return_sequences": script_args.K,
     "max_new_tokens": script_args.max_new_tokens,
-    "seed": script_args.seed,
 }
 
 
@@ -131,7 +130,7 @@ dataloader = DataLoader(ds, batch_size=script_args.batch_size, shuffle=False, co
 
 model, dataloader = accelerator.prepare(model, dataloader)
 
-prompts, responses = generate(model, dataloader, tokenizer, accelerator, **generation_kwargs)
+prompts, responses = generate(model, dataloader, tokenizer, accelerator, script_args.seed, **generation_kwargs)
 
 ####
 # We repeat each prompt for K times

@@ -781,6 +781,7 @@ def generate(
     dataloader: DataLoader,
     tokenizer: PreTrainedTokenizerBase,
     accelerator: Accelerator,
+    seed: int,
     **generation_kwargs,
 ) -> Tuple[List[str], List[str]]:
     """Generate samples using model using specified generation_kwargs.
@@ -806,6 +807,7 @@ def generate(
         all_tokens = accelerator.unwrap_model(model).generate(
             batch["input_ids"],
             attention_mask=batch["attention_mask"],
+            seed=seed,
             **generation_kwargs,
         )
 
