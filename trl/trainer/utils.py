@@ -801,13 +801,17 @@ def generate(
     all_prompts = []
     pbar = tqdm(total=len(dataloader), disable=not accelerator.is_local_main_process)
 
+
+    torch.manual_seed(seed=seed)
+    torch.cuda.manual_seed_all(seed=seed)
+    np.random.seed(seed=seed)
+
     for batch in dataloader:
         sequence_length = batch["input_ids"].shape[1]
 
         all_tokens = accelerator.unwrap_model(model).generate(
             batch["input_ids"],
             attention_mask=batch["attention_mask"],
-            seed=seed,
             **generation_kwargs,
         )
 
