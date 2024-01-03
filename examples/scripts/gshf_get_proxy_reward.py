@@ -132,10 +132,10 @@ print("data_size:", data_size, "data_size0:", data_size0, "local_rank:", local_r
 share = int(data_size / world_size) 
 ds = ds.select(np.arange(local_rank * share, (local_rank + 1)*share))
 responses_pos = [sample['input'] + sample['output'][0] for sample in ds]
-responses_neg =  [sample['input'] + sample['output'][1] for sample in ds]
+#responses_neg =  [sample['input'] + sample['output'][1] for sample in ds]
 #N = 2000
-print(len(responses_pos), len(responses_neg))
-N = len(responses_neg)
+#print(len(responses_pos), len(responses_neg))
+N = len(responses_pos)
 
 
 def get_reward(test_texts):
@@ -150,15 +150,29 @@ data = []
 cnt = 0
 
 # tqdm is used to show the progress bar
+
+has_rewards = 'rewards' in ds.features
+
 with torch.no_grad():
     for sample in tqdm(ds):
         test_texts = [sample['input'] + script_args.input_output_delimiter + tmp_output for tmp_output in sample['output']]
         try:
             rewards = get_reward(test_texts)
-            data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
-            cnt += 1
-            if rewards[0] > -1000:
-                scores.append(rewards[0])
+            if has_rewards:
+                new_rewards = []
+                idx = 0
+                for r in rewards:
+                    new_r = rewards[idx]
+                    if type(r) == list:
+                        new_rewards.append(r+[new_r])
+                    elif type(r) == float:
+                        new_rewards.append([r,new_r])
+                    idx+=1
+            else:
+                data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
+                cnt += 1
+                if rewards[0] > -1000:
+                    scores.append(rewards[0])
         except RuntimeError:
             with open(f"error_{cnt}.txt", "w") as f:
                 for tmp in test_texts:
