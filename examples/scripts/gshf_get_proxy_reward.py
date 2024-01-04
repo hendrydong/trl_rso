@@ -168,6 +168,7 @@ with torch.no_grad():
                     elif type(r) == float:
                         new_rewards.append([r,new_r])
                     idx+=1
+                data.append({"input": sample['input'], "output": sample['output'], "rewards": new_rewards})
             else:
                 data.append({"input": sample['input'], "output": sample['output'], "rewards": rewards})
                 cnt += 1
