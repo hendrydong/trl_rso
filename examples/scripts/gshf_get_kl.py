@@ -39,6 +39,11 @@ class ScriptArguments:
         default="/import/home/share/data/hanze/open_llama_3b_v2_instruction_following_1epoch_on_relabel_split_2w_for_sft/",
         metadata={"help": "the location of the output file"},
     )
+    json_file: Optional[str] = field(
+        default="./5000_dpo.json",
+        metadata={"help": "the location of the input file"},
+    )
+
     
     
 
@@ -52,7 +57,7 @@ parser = HfArgumentParser(ScriptArguments)
 script_args = parser.parse_args_into_dataclasses()[0]
 
 
-ds_dir = script_args.model_name_or_path + "/eval_set/eval.json"
+ds_dir = script_args.json_file
 model_name = script_args.model_name_or_path#"/home/xiongwei/LMFlow/DATA/sft_open_llama_3b_1epoch_plus_hh_rlhf_1epoch"
 ref_name = script_args.ref_model#"/home/xiongwei/gshf_gen_data/LMFlow_RAFT_Dev/data/my_gen.json"
 
