@@ -69,7 +69,7 @@ accelerator = Accelerator()
 
 ds_dir = script_args.json_path#"/home/xiongwei/over_opt/LMFlow_RAFT_Dev/output_models/forgetting_proj/over_opt_raft3b_get_samples_by_if_model_max512/model0/infer_set/my_infer_set.json"
 output_dir = script_args.output_dir#"/home/xiongwei/gshf_gen_data/LMFlow_RAFT_Dev/data/my_filtered_set.json"
-reward_model = script_args.proxy_reward_name_or_path#"/home/xiongwei/rm_study/LMFlow/output_models/gold_rm_7b_lora_1e4_bz16_with_2epoch_sft_boundary_loss5/merged_rm"
+#reward_model = script_args.proxy_reward_name_or_path#"/home/xiongwei/rm_study/LMFlow/output_models/gold_rm_7b_lora_1e4_bz16_with_2epoch_sft_boundary_loss5/merged_rm"
 from transformers import PreTrainedModel, LlamaConfig, LlamaModel, LlamaTokenizer
 import torch.nn as nn
 import torch
@@ -132,7 +132,7 @@ has_rewards = 'rewards' in ds.features
 assert has_rewards
 with torch.no_grad():
     for sample in tqdm(ds):
-        test_texts = [sample['input'] + script_args.input_output_delimiter + tmp_output for tmp_output in sample['output']]
+        #test_texts = [sample['input'] + script_args.input_output_delimiter + tmp_output for tmp_output in sample['output']]
         rewards = sample['rewards']
         new_rewards = []
         idx = 0
