@@ -169,6 +169,8 @@ model, opt = accelerator.prepare(model, optimizer)
 
 if not script_args.baseline_path:
     baseline_path = "eval_plus_gold_reward.json"
+else:
+    baseline_path = script_args.baseline_path
 sft = load_dataset("json", data_files=baseline_path, split="train", field="instances")
 #base_dir = "/home/xiongwei/gshf_gold_test/LMFlow_RAFT_Dev/output_models/online_dpo/iter3/1e6/checkpoint-pymodel"
 
