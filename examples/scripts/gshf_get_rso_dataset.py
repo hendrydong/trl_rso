@@ -70,6 +70,10 @@ class ScriptArguments:
         default=" ",
         metadata={"help": "the delimiter between input and output"},
     )
+    max_num_candidates: Optional[int] = field(
+        default=100,
+        metadata={"help": "the maximum number of candidates"},
+    )
 
 
 def first_round_ranking(responses: List[str], rewards: List[float]) -> Tuple[List[str], List[str]]:
@@ -193,6 +197,9 @@ for sample in ds:
         cnt += 1
         continue
     if len(sample["output"])>=script_args.num_samples_per_prompt:
+        if len(sample["output"]) > script_args.max_num_candidates:
+            sample["output"] = sample["output"][:script_args.max_num_candidates]
+            sample["rewards"] = sample["rewards"][:script_args.max_num_candidates]
         #print(len(sample["rewards"]),sample["rewards"])
         accepted, rewards = conduct_rejection_sampling(sample["output"],
                                     sample["rewards"], 
@@ -212,10 +219,6 @@ for sample in ds:
             data.append({"positive": sample['input'] + script_args.input_output_delimiter + chosen[i],
                         "negative": sample['input'] + script_args.input_output_delimiter + rejected[i]})
 
-    #if sample['rewards'][0] > sample['rewards'][1]:
-    #    data.append({"positive": sample['input'] + sample['output'][0], "negative": sample['input'] + sample['output'][1]})
-    #else:
-    #    data.append({"positive": sample['input'] + sample['output'][1], "negative": sample['input'] + sample['output'][0]})
 
 print("Some samples are too long so deleted", cnt)
 print("We collect ", len(data), " comparison pairs")
