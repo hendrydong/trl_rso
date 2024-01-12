@@ -109,8 +109,6 @@ data_size = len(ds['input'])
 share = int(data_size / world_size) 
 ds = ds.select(np.arange(local_rank * share, (local_rank + 1)*share))
 
-optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=0.0001)
-optimizer2 = torch.optim.SGD(filter(lambda p: p.requires_grad, ref_model.parameters()), lr=0.0001)
 
 data_collator = DataCollatorForSeq2Seq(tokenizer, max_length=400, pad_to_multiple_of=1)
 
@@ -118,9 +116,9 @@ dataloader1 = DataLoader(ds, batch_size=4, shuffle=False, collate_fn=data_collat
 dataloader2 = DataLoader(ds, batch_size=4, shuffle=False, collate_fn=data_collator)
 
 
-model, dl, opt = accelerator.prepare(model, dataloader1, optimizer)
+model, dl = accelerator.prepare(model, dataloader1)
 
-ref_model, dl2, opt2 = accelerator2.prepare(ref_model, dataloader2, optimizer2)
+ref_model, dl2 = accelerator2.prepare(ref_model, dataloader2)
 
 
 
