@@ -162,10 +162,9 @@ def get_win_rate_with_sft(ds1, ds2):
 
 model = LlamaRewardModel.from_pretrained(script_args.gold_reward_name_or_path).to(torch.bfloat16)
 model = model.to(device)
-optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=0.0001)
 
 
-model, opt = accelerator.prepare(model, optimizer)
+model = accelerator.prepare(model)
 
 if not script_args.baseline_path:
     baseline_path = "eval_plus_gold_reward.json"
