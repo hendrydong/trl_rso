@@ -29,7 +29,7 @@ from trl.trainer.utils import generate
 from collections import defaultdict
 
 
-
+@dataclass
 class ScriptArguments:
     """
     The arguments for the DPO training script.
@@ -42,6 +42,8 @@ class ScriptArguments:
         default="",
         metadata={"help": "the location of the output file"},
     )
+
+
 
 parser = HfArgumentParser(ScriptArguments)
 script_args = parser.parse_args_into_dataclasses()[0]
