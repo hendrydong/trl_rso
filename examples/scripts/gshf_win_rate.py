@@ -60,7 +60,8 @@ def get_win_rate_with_sft(ds1, ds2):
             total += 1
     for sample in ds2:
         #print(sample['input'])
-        assert len(data_comp[sample['input']]) > 0
+        if len(data_comp[sample['input']]) == 0:
+            continue
         if len(data_comp[sample['input']]) == 1:
             if sample['rewards'][0] > data_comp[sample['input']][0]:
                 win += 1
