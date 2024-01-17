@@ -141,7 +141,7 @@ optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()
 
 model, dataloader, opt = accelerator.prepare(model, dataloader, optimizer)
 
-prompts, responses = generate(model, dataloader, tokenizer, accelerator, **generation_kwargs)
+prompts, responses = generate(model, dataloader, tokenizer, accelerator, seed = 0, **generation_kwargs)
 
 ####
 # We repeat each prompt for K times
