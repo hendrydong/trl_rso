@@ -27,7 +27,7 @@ class ScriptArguments:
     The arguments for the DPO training script.
     """
     model_name_or_path: Optional[str] = field(
-        default="/home/xiongwei/gshf_gold_test/LMFlow_RAFT_Dev/output_models/online_dpo_strong_ref/iter2/tmp/checkpoint-pymodel3500",
+        default="./openllama3b_dpo_v2/checkpoint-2000/",
         #default="/home/xiongwei/gshf_gold_test/LMFlow_RAFT_Dev/output_models/online_rso/iter1/beta_1.0_8_pick_2/checkpoint-pymodel1784",
         # default="/home/xiongwei/gshf_gold_test/LMFlow_RAFT_Dev/output_models/gshf_online/iter2/inner_1/checkpoint-pymodel1950",
         # default="/home/xiongwei/rm_study/LMFlow/output_models/exp_no_sharegpt/open_llama_3b_v2_instruction_following_1epoch_on_relabel_split_2w_for_sft",
@@ -37,7 +37,7 @@ class ScriptArguments:
         metadata={"help": "the location of the SFT model name or path"},
     )
     dataset_name_or_path: Optional[str] = field(
-        default="/home/xiongwei/rm_study/LMFlow/data/no_share_gpt_hh/offline/split_3iters/iter3/rlhf_prompt/split_prompt.json",
+        default="/home/share/data/hanze/no_share_gpt_hh/offline/rlhf/rlhf_eval/helpful_5739.json",
         #default="/home/xiongwei/rm_study/LMFlow/data/helpful/rlhf/rlhf_eval/helpful_5739.json",
         #default="/home/xiongwei/rm_study/LMFlow/data/helpful/rlhf/rlhf_prompt/helpful_100000.json",
         #default="/home/xiongwei/gshf_gold_test/LMFlow_RAFT_Dev/output_models/gshf_online/new_iter1/1w5_not_used_prompts.json",
@@ -47,7 +47,7 @@ class ScriptArguments:
         #default="/home/xiongwei/gshf_gold_test/LMFlow_RAFT_Dev/output_models/online_dpo/new_iter2/dpo_iter2_gen.json",
         #default="/home/xiongwei/over_opt/LMFlow_RAFT_Dev/output_models/12_30/raft/baseline/iter5/gen.json",
         #default="/home/xiongwei/rm_study/LMFlow/output_models/exp_no_sharegpt/open_llama_3b_v2_instruction_following_1epoch_on_hh_bz12/eval/my_eval.json",
-        default="/home/xiongwei/gshf_gold_test/LMFlow_RAFT_Dev/output_models/online_dpo_strong_ref/iter3/iter3_k1_by_current_policy.json",
+        default="dpo_eval_reward.json",
         metadata={"help": "the location of the output file"},
     )
     batch_size: Optional[int] = field(
