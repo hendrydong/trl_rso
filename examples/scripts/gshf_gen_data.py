@@ -59,6 +59,10 @@ class ScriptArguments:
         default=42,
         metadata={"help": "the random seed"},
     )
+    temperature: Optional[float] = field(
+        default=1.0,
+        metadata={"help": "the temperature"},
+    )
 
 
 
@@ -86,7 +90,7 @@ generation_kwargs = {
     "top_p": 1.0,
     "do_sample": True,
     "pad_token_id": tokenizer.eos_token_id,
-    "temperature": 1.0,
+    "temperature": script_args.temperature,
     "num_return_sequences": script_args.K,
     "max_new_tokens": script_args.max_new_tokens,
 }
